@@ -1,0 +1,407 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SISU Tour Results</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f4;
+      --panel: #ffffff;
+      --text: #151719;
+      --muted: #5d646b;
+      --line: #d9ded7;
+      --accent: #0f766e;
+      --accent-dark: #134e4a;
+      --warn: #9f2d20;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    header {
+      background: #1f2933;
+      color: white;
+      padding: 28px 20px 24px;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      color: #d7dee7;
+      font-size: 0.95rem;
+    }
+
+    main {
+      padding: 22px 0 34px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.1fr) minmax(150px, 0.7fr) minmax(150px, 0.7fr) auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      min-height: 42px;
+      padding: 9px 10px;
+    }
+
+    .toggle {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 2px;
+      text-transform: none;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .toggle input {
+      width: 18px;
+      min-height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #eef3ef;
+      color: #28323a;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    td:first-child,
+    th:first-child {
+      white-space: normal;
+      min-width: 180px;
+    }
+
+    tbody tr:hover {
+      background: #f3faf7;
+    }
+
+    .cell-rider-name {
+      min-width: 300px !important;
+      max-width: 300px !important;
+      line-break: anywhere !important;
+    }
+
+    .cell-team-name {
+      min-width: 200px !important;
+      max-width: 200px !important;
+      line-break: anywhere !important;
+    }
+
+    .category {
+      display: inline-flex;
+      min-width: 42px;
+      justify-content: center;
+      border: 1px solid #afd6d0;
+      border-radius: 999px;
+      padding: 2px 8px;
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    .missing {
+      color: var(--muted);
+    }
+
+    .gc {
+      font-weight: 750;
+    }
+
+    .empty {
+      padding: 28px 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 820px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toggle {
+        min-height: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <h1>SISU Tour Results</h1>
+      <div class="summary">
+        <span id="result-count">200 riders</span>
+        <span>Generated 04 Jul 2026 09:30</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="toolbar" aria-label="Result filters">
+      <label>
+        Rider search
+        <input id="search" type="search" placeholder="Search rider or team">
+      </label>
+      <label>
+        vElo Category
+        <select id="category-filter">
+          <option value="">All categories</option>
+        </select>
+      </label>
+      <label>
+        Team
+        <select id="team-filter">
+          <option value="">All teams</option>
+        </select>
+      </label>
+      <label class="toggle">
+        <input id="complete-filter" type="checkbox">
+        Hide incomplete
+      </label>
+    </section>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="riderName">Rider</th>
+            <th data-sort="veloCategorySort">vElo</th>
+            <th data-sort="veloScore">vElo Score</th>
+            <th data-sort="team">Team</th>
+            <th data-sort="stage1Time">Stage 1</th>
+            <th data-sort="stage2Time">Stage 2</th>
+            <th data-sort="stage3Time">Stage 3</th>
+            <th data-sort="stage4Time">Stage 4</th>
+            <th data-sort="stage5Time">Stage 5</th>
+            <th data-sort="stage6Time">Stage 6</th>
+            <th data-sort="stage7Time">Stage 7</th>
+            <th data-sort="gcSort">GC Time</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+      <div id="empty-state" class="empty" hidden>No riders match the current filters.</div>
+    </div>
+
+    <footer>
+      Created by Will Smith (Cyclobrewer) - https://www.youtube.com/@cyclobrewer
+    </footer>
+  </main>
+
+  <script>
+    const results = [{"riderName":"Manfred Senn","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"3154","team":"Talent:frei p/b Baldiso","stage1Time":"00:34:58","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:34:58","gcSort":2098,"completedStages":1,"isComplete":false},{"riderName":"Robin Hak","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2702","team":"SISU Racing","stage1Time":"00:35:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:35:57","gcSort":2157,"completedStages":1,"isComplete":false},{"riderName":"Pierre Almeida [HEX]","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"3575","team":"HEXAGONE.CC","stage1Time":"00:36:11","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:36:11","gcSort":2171,"completedStages":1,"isComplete":false},{"riderName":"Jurre Kamminga (SISU)","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2600","team":"SISU Racing","stage1Time":"00:36:13","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:36:13","gcSort":2173,"completedStages":1,"isComplete":false},{"riderName":"Christopher Keogh [eSRT]","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2916","team":"eSRT","stage1Time":"00:36:19","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:36:19","gcSort":2179,"completedStages":1,"isComplete":false},{"riderName":"Raul Nieto Luque","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"3107","team":"TEZH Racing","stage1Time":"00:36:27","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:36:27","gcSort":2187,"completedStages":1,"isComplete":false},{"riderName":"Pavel Hrazdil [RtB]","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2494","team":"RtB","stage1Time":"00:36:31","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:36:31","gcSort":2191,"completedStages":1,"isComplete":false},{"riderName":"Thomas S\u0026oslash;rensen #SISU# (YT: MrPedel)","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2862","team":"SISU Racing","stage1Time":"00:37:03","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:37:03","gcSort":2223,"completedStages":1,"isComplete":false},{"riderName":"Ray McCaughey TNP","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2640","team":"Team Not Pogi","stage1Time":"00:37:21","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:37:21","gcSort":2241,"completedStages":1,"isComplete":false},{"riderName":"Brage Bergeng [V]","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2336","team":"Vikings","stage1Time":"00:37:41","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:37:41","gcSort":2261,"completedStages":1,"isComplete":false},{"riderName":"Chase Aulidge (Nashville Local/CC)","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2121","team":"CC","stage1Time":"00:37:47","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:37:47","gcSort":2267,"completedStages":1,"isComplete":false},{"riderName":"Scott Harpham","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"1949","team":"-","stage1Time":"00:37:59","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:37:59","gcSort":2279,"completedStages":1,"isComplete":false},{"riderName":"Wib Wob","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2578","team":"\u0026#129420; HCT \u0026#129420;","stage1Time":"00:38:07","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:07","gcSort":2287,"completedStages":1,"isComplete":false},{"riderName":"KettyG","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2234","team":"IZM","stage1Time":"00:38:08","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:08","gcSort":2288,"completedStages":1,"isComplete":false},{"riderName":"D. Kehrmaschine","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2284","team":"ZRG-R","stage1Time":"00:38:16","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:16","gcSort":2296,"completedStages":1,"isComplete":false},{"riderName":"Lucian Stoica","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2121","team":"DIRT","stage1Time":"00:38:19","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:19","gcSort":2299,"completedStages":1,"isComplete":false},{"riderName":"Naofumi Nozaki [CC]","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2558","team":"CC","stage1Time":"00:38:28","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:28","gcSort":2308,"completedStages":1,"isComplete":false},{"riderName":"Naohide Hamamoto [ZWC]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2009","team":"TEAM ZWC","stage1Time":"00:38:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:29","gcSort":2309,"completedStages":1,"isComplete":false},{"riderName":"X Y [RtB]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"1922","team":"RtB","stage1Time":"00:38:34","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:34","gcSort":2314,"completedStages":1,"isComplete":false},{"riderName":"Karsten Neus","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"1949","team":"TeamNL","stage1Time":"00:38:49","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:49","gcSort":2329,"completedStages":1,"isComplete":false},{"riderName":"Lee Varanyak [Fellowship]","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1802","team":"Fellowship","stage1Time":"00:38:51","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:51","gcSort":2331,"completedStages":1,"isComplete":false},{"riderName":"Jens Jeremy (TeamNL)","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2084","team":"TeamNL","stage1Time":"00:38:53","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:53","gcSort":2333,"completedStages":1,"isComplete":false},{"riderName":"Jarred Williams[SISU]","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1873","team":"SISU Racing","stage1Time":"00:38:55","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:55","gcSort":2335,"completedStages":1,"isComplete":false},{"riderName":"LIM [TOP]Keon Yeob[1134]","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2577","team":"-","stage1Time":"00:38:55","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:38:55","gcSort":2335,"completedStages":1,"isComplete":false},{"riderName":"Michael Goldstein","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2361","team":"A-P-V","stage1Time":"00:39:11","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:39:11","gcSort":2351,"completedStages":1,"isComplete":false},{"riderName":"Coach lak (TNP)","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2042","team":"Team Not Pogi","stage1Time":"00:39:26","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:39:26","gcSort":2366,"completedStages":1,"isComplete":false},{"riderName":"Michael Wieder","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2034","team":"GTR","stage1Time":"00:39:35","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:39:35","gcSort":2375,"completedStages":1,"isComplete":false},{"riderName":"Jack  Matthews","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2215","team":"-","stage1Time":"00:39:38","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:39:38","gcSort":2378,"completedStages":1,"isComplete":false},{"riderName":"Aled Jones","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2287","team":"Team Not Pogi","stage1Time":"00:39:45","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:39:45","gcSort":2385,"completedStages":1,"isComplete":false},{"riderName":"Chuck Keller  (SISU)","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2218","team":"SISU Racing","stage1Time":"00:39:50","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:39:50","gcSort":2390,"completedStages":1,"isComplete":false},{"riderName":"Crank Sinatra (RollCo)","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1890","team":"RollCo","stage1Time":"00:40:03","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:03","gcSort":2403,"completedStages":1,"isComplete":false},{"riderName":"S .Ken[AsC]","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1876","team":"[AsC-Race]","stage1Time":"00:40:06","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:06","gcSort":2406,"completedStages":1,"isComplete":false},{"riderName":"Nicholas Hestand","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1847","team":"SISU Racing","stage1Time":"00:40:10","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:10","gcSort":2410,"completedStages":1,"isComplete":false},{"riderName":"Seamus Sheehy","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2392","team":"A-P-V","stage1Time":"00:40:16","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:16","gcSort":2416,"completedStages":1,"isComplete":false},{"riderName":"Coen Schouten","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1861","team":"TeamNL","stage1Time":"00:40:20","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:20","gcSort":2420,"completedStages":1,"isComplete":false},{"riderName":"Robert Hartwig","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2097","team":"RollCo","stage1Time":"00:40:24","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:24","gcSort":2424,"completedStages":1,"isComplete":false},{"riderName":"Edmund Tang","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1396","team":"-","stage1Time":"00:40:40","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:40","gcSort":2440,"completedStages":1,"isComplete":false},{"riderName":"Fabrizio Germani (ITA)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1608","team":"Team Italy","stage1Time":"00:40:43","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:43","gcSort":2443,"completedStages":1,"isComplete":false},{"riderName":"Stuie D","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2032","team":"NZBRO","stage1Time":"00:40:45","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:45","gcSort":2445,"completedStages":1,"isComplete":false},{"riderName":"Jon Meals","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1855","team":"TFC","stage1Time":"00:40:49","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:49","gcSort":2449,"completedStages":1,"isComplete":false},{"riderName":"Caspar  Christensen [DBR]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"1915","team":"DBR","stage1Time":"00:40:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:40:57","gcSort":2457,"completedStages":1,"isComplete":false},{"riderName":"Shaun Hutchinson","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1834","team":"WCC","stage1Time":"00:41:02","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:02","gcSort":2462,"completedStages":1,"isComplete":false},{"riderName":"Matthew Gleeson [TNP]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2056","team":"Fellowship","stage1Time":"00:41:07","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:07","gcSort":2467,"completedStages":1,"isComplete":false},{"riderName":"Kyle Mjor [DINOS/HERD]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2065","team":"HERD","stage1Time":"00:41:18","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:18","gcSort":2478,"completedStages":1,"isComplete":false},{"riderName":"Adam Check (RollCo)","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2133","team":"RollCo","stage1Time":"00:41:22","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:22","gcSort":2482,"completedStages":1,"isComplete":false},{"riderName":"Ivar Christensen","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1802","team":"-","stage1Time":"00:41:22","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:22","gcSort":2482,"completedStages":1,"isComplete":false},{"riderName":"William Smith (RollCo/TNP)","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1817","team":"Team Not Pogi","stage1Time":"00:41:28","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:28","gcSort":2488,"completedStages":1,"isComplete":false},{"riderName":"Daniel Wolbrink","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"1911","team":"SISU Racing","stage1Time":"00:41:32","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:32","gcSort":2492,"completedStages":1,"isComplete":false},{"riderName":"Kieren Powell[TBR]","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1569","team":"TBR Racing","stage1Time":"00:41:43","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:43","gcSort":2503,"completedStages":1,"isComplete":false},{"riderName":"Kasper Buur  [WFCC / CVC]","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1658","team":"Copenhagen Virtual Cycling","stage1Time":"00:41:49","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:49","gcSort":2509,"completedStages":1,"isComplete":false},{"riderName":"Leon  Clement","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1574","team":"COALITION","stage1Time":"00:41:54","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:54","gcSort":2514,"completedStages":1,"isComplete":false},{"riderName":"Shane McAloon (RollCo)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1588","team":"RollCo","stage1Time":"00:41:59","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:41:59","gcSort":2519,"completedStages":1,"isComplete":false},{"riderName":"Mark Baker","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"1903","team":"OTR Racing","stage1Time":"00:42:03","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:03","gcSort":2523,"completedStages":1,"isComplete":false},{"riderName":"John Doyle","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1595","team":"-","stage1Time":"00:42:12","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:12","gcSort":2532,"completedStages":1,"isComplete":false},{"riderName":"Y Mini\u0026#128663;(TMR\u0026#65289;","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1458","team":"TMR p/b Passage","stage1Time":"00:42:12","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:12","gcSort":2532,"completedStages":1,"isComplete":false},{"riderName":"DCR Dan","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1582","team":"-","stage1Time":"00:42:14","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:14","gcSort":2534,"completedStages":1,"isComplete":false},{"riderName":"Alan Glover","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1526","team":"Limerick TC","stage1Time":"00:42:15","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:15","gcSort":2535,"completedStages":1,"isComplete":false},{"riderName":"Eugenio Montecinos","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1806","team":"SISU Racing","stage1Time":"00:42:17","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:17","gcSort":2537,"completedStages":1,"isComplete":false},{"riderName":"Steven Edmundson (RWB Emerald Flyers)","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1888","team":"Team RWB","stage1Time":"00:42:21","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:21","gcSort":2541,"completedStages":1,"isComplete":false},{"riderName":"Eddie Adams","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1862","team":"SISU Racing","stage1Time":"00:42:26","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:26","gcSort":2546,"completedStages":1,"isComplete":false},{"riderName":"BroFessor","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1640","team":"SISU Racing","stage1Time":"00:42:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:29","gcSort":2549,"completedStages":1,"isComplete":false},{"riderName":"-   l_Pablo_l [ZABI]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"1948","team":"ZABI","stage1Time":"00:42:31","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:31","gcSort":2551,"completedStages":1,"isComplete":false},{"riderName":"Mitchell Fletcher","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1636","team":"PCRT","stage1Time":"00:42:31","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:31","gcSort":2551,"completedStages":1,"isComplete":false},{"riderName":"Gareth Brewer (RollCo)","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1801","team":"RollCo","stage1Time":"00:42:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:33","gcSort":2553,"completedStages":1,"isComplete":false},{"riderName":"Justin Agler [Fellowship]","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1562","team":"Fellowship","stage1Time":"00:42:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:33","gcSort":2553,"completedStages":1,"isComplete":false},{"riderName":"TADEUSZ H (OMG)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1604","team":"OMG","stage1Time":"00:42:38","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:38","gcSort":2558,"completedStages":1,"isComplete":false},{"riderName":"Trevor Jarrett","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1733","team":"WCC","stage1Time":"00:42:40","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:40","gcSort":2560,"completedStages":1,"isComplete":false},{"riderName":"Mark Williams (RollCo)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1497","team":"RollCo","stage1Time":"00:42:45","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:45","gcSort":2565,"completedStages":1,"isComplete":false},{"riderName":"Tommy Nuttall(TEAM ORYX)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1135","team":"TEAM ORYX","stage1Time":"00:42:50","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:50","gcSort":2570,"completedStages":1,"isComplete":false},{"riderName":"Anders B Frikke [Psykl]","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1528","team":"Psyk\u0026Oslash;l","stage1Time":"00:42:52","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:52","gcSort":2572,"completedStages":1,"isComplete":false},{"riderName":"Anne  L\u0026oslash;fshus [V]","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1469","team":"Vikings","stage1Time":"00:42:55","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:55","gcSort":2575,"completedStages":1,"isComplete":false},{"riderName":"Reggie Hunter","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1626","team":"DraftingDinos","stage1Time":"00:42:58","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:42:58","gcSort":2578,"completedStages":1,"isComplete":false},{"riderName":"Rctfan","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1358","team":"RHINO","stage1Time":"00:43:02","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:02","gcSort":2582,"completedStages":1,"isComplete":false},{"riderName":"Patty Collins","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1530","team":"-","stage1Time":"00:43:03","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:03","gcSort":2583,"completedStages":1,"isComplete":false},{"riderName":"Greg Hilbert","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1507","team":"Stages Cycling","stage1Time":"00:43:09","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:09","gcSort":2589,"completedStages":1,"isComplete":false},{"riderName":"JV Allstar","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1641","team":"DIRT","stage1Time":"00:43:15","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:15","gcSort":2595,"completedStages":1,"isComplete":false},{"riderName":". Mark \u0026#129373; ..","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1454","team":"Fellowship","stage1Time":"00:43:16","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:16","gcSort":2596,"completedStages":1,"isComplete":false},{"riderName":"J Haereid","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1425","team":"2SK","stage1Time":"00:43:17","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:17","gcSort":2597,"completedStages":1,"isComplete":false},{"riderName":"Casey Morgan","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1494","team":"-","stage1Time":"00:43:18","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:18","gcSort":2598,"completedStages":1,"isComplete":false},{"riderName":"J. Persoons","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1573","team":"-","stage1Time":"00:43:20","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:20","gcSort":2600,"completedStages":1,"isComplete":false},{"riderName":"Kirk Blenkiron","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1414","team":"-","stage1Time":"00:43:23","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:23","gcSort":2603,"completedStages":1,"isComplete":false},{"riderName":"Manuel Fernandez Esteban(ZABI)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1475","team":"ZABI","stage1Time":"00:43:27","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:27","gcSort":2607,"completedStages":1,"isComplete":false},{"riderName":"Sue Lee\u0027s  Husband","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1322","team":"-","stage1Time":"00:43:30","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:30","gcSort":2610,"completedStages":1,"isComplete":false},{"riderName":"B. Copestake","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1644","team":"Team Not Pogi","stage1Time":"00:43:32","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:32","gcSort":2612,"completedStages":1,"isComplete":false},{"riderName":"Tim Williams (TNP)","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1297","team":"Team Not Pogi","stage1Time":"00:43:35","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:35","gcSort":2615,"completedStages":1,"isComplete":false},{"riderName":"Aiden Donnellan (GTR)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1495","team":"GTR","stage1Time":"00:43:42","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:42","gcSort":2622,"completedStages":1,"isComplete":false},{"riderName":"Ross McLaughlin","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1601","team":"-","stage1Time":"00:43:46","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:46","gcSort":2626,"completedStages":1,"isComplete":false},{"riderName":"Tracy Buttars","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1075","team":"-","stage1Time":"00:43:47","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:47","gcSort":2627,"completedStages":1,"isComplete":false},{"riderName":"P\u0026eacute;ter B\u0026aacute;lint","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1622","team":"Fellowship","stage1Time":"00:43:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:43:57","gcSort":2637,"completedStages":1,"isComplete":false},{"riderName":"Mark Miklosovich","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1500","team":"-","stage1Time":"00:44:00","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:00","gcSort":2640,"completedStages":1,"isComplete":false},{"riderName":"Wilson Milanezi","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1335","team":"VARGAS","stage1Time":"00:44:01","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:01","gcSort":2641,"completedStages":1,"isComplete":false},{"riderName":"Connor Almond [Fellowship]","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1322","team":"Fellowship","stage1Time":"00:44:04","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:04","gcSort":2644,"completedStages":1,"isComplete":false},{"riderName":"D arrenM","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1535","team":"Team RWB","stage1Time":"00:44:06","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:06","gcSort":2646,"completedStages":1,"isComplete":false},{"riderName":"Anthony Brugiroux (RHINO)","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1306","team":"RHINO","stage1Time":"00:44:08","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:08","gcSort":2648,"completedStages":1,"isComplete":false},{"riderName":"Marc-Antoine Guay","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1379","team":"-","stage1Time":"00:44:11","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:11","gcSort":2651,"completedStages":1,"isComplete":false},{"riderName":"Mads Meldgaard","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1218","team":"-","stage1Time":"00:44:13","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:13","gcSort":2653,"completedStages":1,"isComplete":false},{"riderName":"Jed Ken","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1388","team":"SISU Racing","stage1Time":"00:44:16","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:16","gcSort":2656,"completedStages":1,"isComplete":false},{"riderName":"Simon Carcagno","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1725","team":"-","stage1Time":"00:44:16","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:16","gcSort":2656,"completedStages":1,"isComplete":false},{"riderName":"Nick Fletcher","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1417","team":"HERD","stage1Time":"00:44:18","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:18","gcSort":2658,"completedStages":1,"isComplete":false},{"riderName":"Clark Ito\u0026#129416;(RtB)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1461","team":"RtB","stage1Time":"00:44:21","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:21","gcSort":2661,"completedStages":1,"isComplete":false},{"riderName":"Maria Petersson (eSRT)","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1323","team":"eSRT","stage1Time":"00:44:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:33","gcSort":2673,"completedStages":1,"isComplete":false},{"riderName":"Ruben Samson","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1457","team":"-","stage1Time":"00:44:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:33","gcSort":2673,"completedStages":1,"isComplete":false},{"riderName":"Kristen F-M","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1224","team":"-","stage1Time":"00:44:36","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:36","gcSort":2676,"completedStages":1,"isComplete":false},{"riderName":"TAKASHI SAGAWA","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1191","team":"-","stage1Time":"00:44:39","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:39","gcSort":2679,"completedStages":1,"isComplete":false},{"riderName":"Jeff Schurz","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1785","team":"-","stage1Time":"00:44:42","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:42","gcSort":2682,"completedStages":1,"isComplete":false},{"riderName":"Kenny Gilkerson","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1411","team":"-","stage1Time":"00:44:44","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:44","gcSort":2684,"completedStages":1,"isComplete":false},{"riderName":"Anker Hoyer [SISU]","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1363","team":"SISU Racing","stage1Time":"00:44:48","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:48","gcSort":2688,"completedStages":1,"isComplete":false},{"riderName":"Andy O\u0026#039;Neill","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1388","team":"SISU Racing","stage1Time":"00:44:50","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:50","gcSort":2690,"completedStages":1,"isComplete":false},{"riderName":"Robert Bracewell [RollCo]","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1288","team":"RollCo","stage1Time":"00:44:54","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:54","gcSort":2694,"completedStages":1,"isComplete":false},{"riderName":"Anthony  Daniel [SYN x Hell\u0027s 500] \u0026#127481;\u0026#127481;","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1173","team":"SYN","stage1Time":"00:44:59","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:44:59","gcSort":2699,"completedStages":1,"isComplete":false},{"riderName":"Alison FJ  \u0026#127988;\u0026#917607;\u0026#917602;\u0026#917623;\u0026#917612;\u0026#917619;\u0026#917631; (Level)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1106","team":"LEVEL Esports","stage1Time":"00:45:11","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:11","gcSort":2711,"completedStages":1,"isComplete":false},{"riderName":"Peter Nelson","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1284","team":"-","stage1Time":"00:45:15","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:15","gcSort":2715,"completedStages":1,"isComplete":false},{"riderName":"matt redshaw","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1263","team":"ZSUNR","stage1Time":"00:45:20","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:20","gcSort":2720,"completedStages":1,"isComplete":false},{"riderName":"Alex Murphy (GTR)","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1367","team":"GTR","stage1Time":"00:45:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:29","gcSort":2729,"completedStages":1,"isComplete":false},{"riderName":"Evie Fletcher","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1259","team":"[GALAXY]","stage1Time":"00:45:31","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:31","gcSort":2731,"completedStages":1,"isComplete":false},{"riderName":"Howie Snyder (TFC-RtB)","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1373","team":"TFC","stage1Time":"00:45:32","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:32","gcSort":2732,"completedStages":1,"isComplete":false},{"riderName":"Zach Storm [SISU]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2089","team":"SISU Racing","stage1Time":"00:45:48","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:48","gcSort":2748,"completedStages":1,"isComplete":false},{"riderName":"Simon Richmond","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1318","team":"-","stage1Time":"00:45:56","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:56","gcSort":2756,"completedStages":1,"isComplete":false},{"riderName":"Mark Vardy (INC Innovation)","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1877","team":"Innovation","stage1Time":"00:45:59","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:45:59","gcSort":2759,"completedStages":1,"isComplete":false},{"riderName":"D Oates","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1300","team":"-","stage1Time":"00:46:03","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:03","gcSort":2763,"completedStages":1,"isComplete":false},{"riderName":"Andy Pope (RollCo)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1145","team":"RollCo","stage1Time":"00:46:04","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:04","gcSort":2764,"completedStages":1,"isComplete":false},{"riderName":"John Swift","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1279","team":"Team Not Pogi","stage1Time":"00:46:04","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:04","gcSort":2764,"completedStages":1,"isComplete":false},{"riderName":"Covi Powell (Coalition)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1046","team":"COALITION","stage1Time":"00:46:08","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:08","gcSort":2768,"completedStages":1,"isComplete":false},{"riderName":"Greg Wiese (Rhino)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1142","team":"RHINO","stage1Time":"00:46:11","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:11","gcSort":2771,"completedStages":1,"isComplete":false},{"riderName":"Bonsai Brian (BON)[CYE]","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1183","team":"CYE","stage1Time":"00:46:12","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:12","gcSort":2772,"completedStages":1,"isComplete":false},{"riderName":"David Johnson","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2309","team":"Team Not Pogi","stage1Time":"00:46:16","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:16","gcSort":2776,"completedStages":1,"isComplete":false},{"riderName":"JB Jones [SISU]","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1225","team":"SISU Racing","stage1Time":"00:46:20","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:20","gcSort":2780,"completedStages":1,"isComplete":false},{"riderName":"Justin Draper [Fellowship]","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1376","team":"Team Not Pogi","stage1Time":"00:46:25","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:25","gcSort":2785,"completedStages":1,"isComplete":false},{"riderName":"S amo [LEVEL]","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1113","team":"LEVEL Esports","stage1Time":"00:46:25","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:25","gcSort":2785,"completedStages":1,"isComplete":false},{"riderName":"Alex Manton  (NZBRO)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1611","team":"NZBRO","stage1Time":"00:46:28","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:28","gcSort":2788,"completedStages":1,"isComplete":false},{"riderName":"Monique Verhoef","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1141","team":"ZWB Cycling","stage1Time":"00:46:34","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:34","gcSort":2794,"completedStages":1,"isComplete":false},{"riderName":"Alan Floyd CycSol/BZR","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"971","team":"BZR eCycling Club","stage1Time":"00:46:35","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:35","gcSort":2795,"completedStages":1,"isComplete":false},{"riderName":"Adam L","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1428","team":"RHINO","stage1Time":"00:46:38","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:38","gcSort":2798,"completedStages":1,"isComplete":false},{"riderName":"Anthony Poole","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1097","team":"-","stage1Time":"00:46:39","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:39","gcSort":2799,"completedStages":1,"isComplete":false},{"riderName":"Caroline Andersson","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1026","team":"Fellowship","stage1Time":"00:46:39","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:39","gcSort":2799,"completedStages":1,"isComplete":false},{"riderName":"kevan thompson","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1036","team":"-","stage1Time":"00:46:45","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:46:45","gcSort":2805,"completedStages":1,"isComplete":false},{"riderName":"_ Davidoffbeat (DIRT TTV)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1067","team":"DIRT","stage1Time":"00:47:00","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:47:00","gcSort":2820,"completedStages":1,"isComplete":false},{"riderName":"John Yi","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"933","team":"-","stage1Time":"00:47:50","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:47:50","gcSort":2870,"completedStages":1,"isComplete":false},{"riderName":"Tremain  Jackson","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1462","team":"SISU Racing","stage1Time":"00:47:55","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:47:55","gcSort":2875,"completedStages":1,"isComplete":false},{"riderName":"Andrew Martin","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1037","team":"Fellowship","stage1Time":"00:47:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:47:57","gcSort":2877,"completedStages":1,"isComplete":false},{"riderName":"Paul Clark(4STAR)","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1189","team":"4STAR","stage1Time":"00:48:02","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:02","gcSort":2882,"completedStages":1,"isComplete":false},{"riderName":"Miriam Gershenson","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1041","team":"COALITION","stage1Time":"00:48:09","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:09","gcSort":2889,"completedStages":1,"isComplete":false},{"riderName":"Sean Morrissey","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"914","team":"SISU Racing","stage1Time":"00:48:18","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:18","gcSort":2898,"completedStages":1,"isComplete":false},{"riderName":"Mike Spe","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1081","team":"SISU Racing","stage1Time":"00:48:25","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:25","gcSort":2905,"completedStages":1,"isComplete":false},{"riderName":"Paul Speg","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1053","team":"RollCo","stage1Time":"00:48:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:29","gcSort":2909,"completedStages":1,"isComplete":false},{"riderName":"Gabriel Vargas","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1094","team":"VARGAS","stage1Time":"00:48:37","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:37","gcSort":2917,"completedStages":1,"isComplete":false},{"riderName":"Mark Murphy (Rhino)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1012","team":"RHINO","stage1Time":"00:48:38","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:38","gcSort":2918,"completedStages":1,"isComplete":false},{"riderName":"Dave Bradshaw","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"943","team":"Fellowship","stage1Time":"00:48:41","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:41","gcSort":2921,"completedStages":1,"isComplete":false},{"riderName":"STEVE LITTLE [SISU]\u0026#129432;","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"891","team":"SISU Racing","stage1Time":"00:48:42","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:42","gcSort":2922,"completedStages":1,"isComplete":false},{"riderName":"Kimberly Taylor","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"805","team":"DraftingDinos","stage1Time":"00:48:46","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:46","gcSort":2926,"completedStages":1,"isComplete":false},{"riderName":"@. CCZWIFTS-YT (RollCo)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1006","team":"RollCo","stage1Time":"00:48:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:48:57","gcSort":2937,"completedStages":1,"isComplete":false},{"riderName":"Simon Eggleton","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"961","team":"Fellowship","stage1Time":"00:49:01","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:01","gcSort":2941,"completedStages":1,"isComplete":false},{"riderName":"Ainsley Yoakam","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"833","team":"-","stage1Time":"00:49:02","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:02","gcSort":2942,"completedStages":1,"isComplete":false},{"riderName":"Darren Byers","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1001","team":"[GALAXY]","stage1Time":"00:49:08","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:08","gcSort":2948,"completedStages":1,"isComplete":false},{"riderName":"Carter Costner [Fellowship]","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1029","team":"Fellowship","stage1Time":"00:49:13","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:13","gcSort":2953,"completedStages":1,"isComplete":false},{"riderName":"Julia Umbrello [eSRT]","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"923","team":"eSRT","stage1Time":"00:49:17","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:17","gcSort":2957,"completedStages":1,"isComplete":false},{"riderName":"Elin Jonsson [SZ]","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1169","team":"SZ","stage1Time":"00:49:18","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:18","gcSort":2958,"completedStages":1,"isComplete":false},{"riderName":"Steve Krejci","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"991","team":"-","stage1Time":"00:49:24","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:24","gcSort":2964,"completedStages":1,"isComplete":false},{"riderName":"Tony A Schwartz2751","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"949","team":"-","stage1Time":"00:49:24","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:24","gcSort":2964,"completedStages":1,"isComplete":false},{"riderName":"DUKE LEW   ( SISU )","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"882","team":"SISU Racing","stage1Time":"00:49:27","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:27","gcSort":2967,"completedStages":1,"isComplete":false},{"riderName":"Frank Eggert Alpecin [WattFabrik] \u0026#127853;","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"909","team":"WATTFabrik","stage1Time":"00:49:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:29","gcSort":2969,"completedStages":1,"isComplete":false},{"riderName":"Steven Smith (Rhino)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1094","team":"RHINO","stage1Time":"00:49:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:29","gcSort":2969,"completedStages":1,"isComplete":false},{"riderName":"Scott Jackson","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"965","team":"GTR","stage1Time":"00:49:38","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:38","gcSort":2978,"completedStages":1,"isComplete":false},{"riderName":"Dami\u0026aacute;n Barrantes Medrano","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"814","team":"-","stage1Time":"00:49:51","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:49:51","gcSort":2991,"completedStages":1,"isComplete":false},{"riderName":"Andy Wagner","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"899","team":"-","stage1Time":"00:50:06","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:06","gcSort":3006,"completedStages":1,"isComplete":false},{"riderName":"Liam MacDonald","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"957","team":"-","stage1Time":"00:50:11","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:11","gcSort":3011,"completedStages":1,"isComplete":false},{"riderName":"Dave Markle (RtB)","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"663","team":"RtB","stage1Time":"00:50:22","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:22","gcSort":3022,"completedStages":1,"isComplete":false},{"riderName":"Clint S","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"859","team":"DIRT","stage1Time":"00:50:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:33","gcSort":3033,"completedStages":1,"isComplete":false},{"riderName":"Ed Ferebee (Rhino)","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"945","team":"RHINO","stage1Time":"00:50:37","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:37","gcSort":3037,"completedStages":1,"isComplete":false},{"riderName":"Melissa I","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"868","team":"-","stage1Time":"00:50:41","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:41","gcSort":3041,"completedStages":1,"isComplete":false},{"riderName":"Gina Fendley","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"476","team":"-","stage1Time":"00:50:45","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:45","gcSort":3045,"completedStages":1,"isComplete":false},{"riderName":"Lieke Elands","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1097","team":"TeamNL","stage1Time":"00:50:56","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:56","gcSort":3056,"completedStages":1,"isComplete":false},{"riderName":"Thibaut Marchal","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"798","team":"\u0026#9889;\u0026#65039;Team Foudre\u0026#9889;\u0026#65039;","stage1Time":"00:50:58","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:50:58","gcSort":3058,"completedStages":1,"isComplete":false},{"riderName":"Gordon Sloan (Rhino Racing)","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"899","team":"RHINO","stage1Time":"00:51:07","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:51:07","gcSort":3067,"completedStages":1,"isComplete":false},{"riderName":"Sarah Hoffmann (Herd)","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"765","team":"HERD","stage1Time":"00:51:08","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:51:08","gcSort":3068,"completedStages":1,"isComplete":false},{"riderName":"andrew schreiner","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"892","team":"-","stage1Time":"00:51:21","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:51:21","gcSort":3081,"completedStages":1,"isComplete":false},{"riderName":"Ove Sunnervall [SZ]","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1519","team":"SZ","stage1Time":"00:51:24","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:51:24","gcSort":3084,"completedStages":1,"isComplete":false},{"riderName":"Fabio Capodei [SISU]","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"818","team":"SISU Racing","stage1Time":"00:51:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:51:29","gcSort":3089,"completedStages":1,"isComplete":false},{"riderName":"Mateo Gomez (COALITION)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1117","team":"COALITION","stage1Time":"00:51:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:51:33","gcSort":3093,"completedStages":1,"isComplete":false},{"riderName":"Robert Mitchell","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"851","team":"-","stage1Time":"00:51:47","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:51:47","gcSort":3107,"completedStages":1,"isComplete":false},{"riderName":"Rafael Monteiro","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"773","team":"-","stage1Time":"00:52:09","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:52:09","gcSort":3129,"completedStages":1,"isComplete":false},{"riderName":"John B","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"807","team":"SISU Racing","stage1Time":"00:52:20","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:52:20","gcSort":3140,"completedStages":1,"isComplete":false},{"riderName":"Tracey Jehu","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"667","team":"-","stage1Time":"00:52:26","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:52:26","gcSort":3146,"completedStages":1,"isComplete":false},{"riderName":"Jonathan Walker [GXY]","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"805","team":"[GALAXY]","stage1Time":"00:52:54","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:52:54","gcSort":3174,"completedStages":1,"isComplete":false},{"riderName":"Michael Musch","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"896","team":"GTR","stage1Time":"00:53:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:53:33","gcSort":3213,"completedStages":1,"isComplete":false},{"riderName":"R\u0026eacute;mi Thierry","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1064","team":"FFZ","stage1Time":"00:54:02","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:54:02","gcSort":3242,"completedStages":1,"isComplete":false},{"riderName":"Michel Binet","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1016","team":"Zwift Quebec","stage1Time":"00:54:06","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:54:06","gcSort":3246,"completedStages":1,"isComplete":false},{"riderName":"Steve D\u0026#039;Alessandro (Coalition)","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"485","team":"COALITION","stage1Time":"00:54:27","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:54:27","gcSort":3267,"completedStages":1,"isComplete":false},{"riderName":"Kayleigh Olander","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"515","team":"-","stage1Time":"00:54:39","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:54:39","gcSort":3279,"completedStages":1,"isComplete":false},{"riderName":"Andrew Telley (CRYO-GEN)","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"617","team":"Team CRYO-GEN","stage1Time":"00:54:49","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:54:49","gcSort":3289,"completedStages":1,"isComplete":false},{"riderName":"Aaron Glee","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"791","team":"SISU Racing","stage1Time":"00:55:02","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:55:02","gcSort":3302,"completedStages":1,"isComplete":false},{"riderName":"Hassane Rashow [fellowship]","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"610","team":"Fellowship","stage1Time":"00:56:25","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:56:25","gcSort":3385,"completedStages":1,"isComplete":false},{"riderName":"S pek AR saurus MGCC","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"569","team":"Kidman Law co","stage1Time":"00:57:20","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:57:20","gcSort":3440,"completedStages":1,"isComplete":false},{"riderName":"Misha Nemer","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"473","team":"-","stage1Time":"00:58:31","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:58:31","gcSort":3511,"completedStages":1,"isComplete":false},{"riderName":"David Morgan","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"521","team":"Fellowship","stage1Time":"00:58:40","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"00:58:40","gcSort":3520,"completedStages":1,"isComplete":false},{"riderName":"I Am  Groot [RtB]","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"486","team":"RtB","stage1Time":"01:00:28","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"01:00:28","gcSort":3628,"completedStages":1,"isComplete":false},{"riderName":"Kasie Fox\u0026#129418;(SISU)","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"327","team":"SISU Racing","stage1Time":"01:02:29","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"01:02:29","gcSort":3749,"completedStages":1,"isComplete":false},{"riderName":"Siol Rider (Hawaii)","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"527","team":"-","stage1Time":"01:02:33","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"01:02:33","gcSort":3753,"completedStages":1,"isComplete":false},{"riderName":"Marc Doucette","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"958","team":"SISU Racing","stage1Time":"01:09:21","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"01:09:21","gcSort":4161,"completedStages":1,"isComplete":false},{"riderName":"Demon Hunter (GTR) @YT \u0026#128121;\u0026#128692;","veloCategory":"10 - Copper","veloCategorySort":10,"veloScore":"262","team":"GTR","stage1Time":"01:37:00","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-","stage6Time":"-","stage7Time":"-","gcTime":"01:37:00","gcSort":5820,"completedStages":1,"isComplete":false}];
+    const columns = ["stage1Time", "stage2Time", "stage3Time", "stage4Time", "stage5Time", "stage6Time", "stage7Time"];
+    const state = {
+      search: "",
+      category: "",
+      team: "",
+      completeOnly: false,
+      sortKey: "gcSort",
+      sortDirection: "asc"
+    };
+
+    const body = document.querySelector("#results-body");
+    const emptyState = document.querySelector("#empty-state");
+    const resultCount = document.querySelector("#result-count");
+    const searchInput = document.querySelector("#search");
+    const categoryFilter = document.querySelector("#category-filter");
+    const teamFilter = document.querySelector("#team-filter");
+    const completeFilter = document.querySelector("#complete-filter");
+
+    function uniqueValues(key) {
+      return [...new Set(results.map(row => row[key]).filter(value => value && value !== "-"))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    }
+
+    function fillSelect(select, values) {
+      values.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.append(option);
+      });
+    }
+
+    function compareRows(a, b) {
+      if (state.sortKey === "gcSort") {
+        const completedStageComparison = b.completedStages - a.completedStages;
+        if (completedStageComparison !== 0) return completedStageComparison;
+      }
+
+      const aValue = a[state.sortKey];
+      const bValue = b[state.sortKey];
+      const direction = state.sortDirection === "asc" ? 1 : -1;
+
+      if (aValue == null && bValue == null) return a.riderName.localeCompare(b.riderName);
+      if (aValue == null) return 1;
+      if (bValue == null) return -1;
+
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return (aValue - bValue) * direction;
+      }
+
+      return String(aValue).localeCompare(String(bValue), undefined, { numeric: true }) * direction;
+    }
+
+    function filteredRows() {
+      const search = state.search.trim().toLowerCase();
+
+      return results
+        .filter(row => !state.category || row.veloCategory === state.category)
+        .filter(row => !state.team || row.team === state.team)
+        .filter(row => !state.completeOnly || row.isComplete)
+        .filter(row => {
+          if (!search) return true;
+          return `${row.riderName} ${row.team}`.toLowerCase().includes(search);
+        })
+        .sort(compareRows);
+    }
+
+    function timeCell(value, extraClass = "") {
+      const className = value === "-" ? `missing ${extraClass}` : extraClass;
+      return `<td class="${className.trim()}">${value}</td>`;
+    }
+
+    function render() {
+      const rows = filteredRows();
+      resultCount.textContent = `${rows.length} of ${results.length} riders`;
+      emptyState.hidden = rows.length > 0;
+
+      body.innerHTML = rows.map(row => `
+        <tr>
+          <td class="cell-rider-name">${escapeHtml(row.riderName)}</td>
+          <td><span class="category">${escapeHtml(row.veloCategory)}</span></td>
+          <td>${escapeHtml(row.veloScore)}</td>
+          <td class="cell-team-name">${escapeHtml(row.team)}</td>
+          ${columns.map(column => timeCell(escapeHtml(row[column]))).join("")}
+          ${timeCell(escapeHtml(row.gcTime), "gc")}
+        </tr>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    fillSelect(categoryFilter, uniqueValues("veloCategory"));
+    fillSelect(teamFilter, uniqueValues("team"));
+
+    searchInput.addEventListener("input", event => {
+      state.search = event.target.value;
+      render();
+    });
+
+    categoryFilter.addEventListener("change", event => {
+      state.category = event.target.value;
+      render();
+    });
+
+    teamFilter.addEventListener("change", event => {
+      state.team = event.target.value;
+      render();
+    });
+
+    completeFilter.addEventListener("change", event => {
+      state.completeOnly = event.target.checked;
+      render();
+    });
+
+    document.querySelectorAll("th[data-sort]").forEach(header => {
+      header.addEventListener("click", () => {
+        const key = header.dataset.sort;
+        if (state.sortKey === key) {
+          state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+        } else {
+          state.sortKey = key;
+          state.sortDirection = key === "gcSort" ? "asc" : "asc";
+        }
+        render();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
