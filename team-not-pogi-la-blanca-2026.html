@@ -1,0 +1,521 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team Not Pogi La Blanca 2026 Results</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f4;
+      --panel: #ffffff;
+      --text: #151719;
+      --muted: #5d646b;
+      --line: #d9ded7;
+      --accent: #0f766e;
+      --accent-dark: #134e4a;
+      --warn: #9f2d20;
+      --th-bg: #eef3ef;
+      --th-text: #28323a;
+      --hover-bg: #f3faf7;
+      --header-bg: #1f2933;
+      --category-border: #afd6d0;
+    }
+
+    html.dark {
+      color-scheme: dark;
+      --bg: #0f1117;
+      --panel: #1a1d27;
+      --text: #e2e8f0;
+      --muted: #8896a7;
+      --line: #2d3448;
+      --accent: #2dd4bf;
+      --accent-dark: #99f6e4;
+      --warn: #f87171;
+      --th-bg: #1e2335;
+      --th-text: #a0aec0;
+      --hover-bg: #1e2a3a;
+      --header-bg: #090c14;
+      --category-border: #2dd4bf55;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    header {
+      background: var(--header-bg);
+      color: white;
+      padding: 28px 20px 24px;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      color: #d7dee7;
+      font-size: 0.95rem;
+    }
+
+    main {
+      padding: 22px 0 34px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.1fr) minmax(150px, 0.7fr) minmax(150px, 0.7fr) auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 650;
+      text-transform: uppercase;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      min-height: 42px;
+      padding: 9px 10px;
+    }
+
+    .toggle {
+      align-items: center;
+      display: flex;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 2px;
+      text-transform: none;
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    .toggle input {
+      width: 18px;
+      min-height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: var(--th-bg);
+      color: var(--th-text);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .cell-position {
+      width: 50px;
+      min-width: 50px !important;
+      max-width: 50px !important;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    th.cell-position {
+      cursor: default;
+    }
+
+    tbody tr:hover {
+      background: var(--hover-bg);
+    }
+
+    .cell-rider-name {
+      white-space: normal;
+      min-width: 300px !important;
+      max-width: 300px !important;
+      line-break: anywhere !important;
+    }
+
+    .cell-team-name {
+      min-width: 200px !important;
+      max-width: 200px !important;
+      line-break: anywhere !important;
+    }
+
+    .team-badge {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      font-size: 0.85rem;
+    }
+
+    .category {
+      display: inline-flex;
+      min-width: 42px;
+      justify-content: center;
+      border: 1px solid var(--category-border);
+      border-radius: 999px;
+      padding: 2px 8px;
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    /* ── Dark mode toggle ─────────────────────────────── */
+    .dark-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 999px;
+      padding: 6px 14px;
+      color: white;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      transition: background 0.2s;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .dark-toggle:hover {
+      background: rgba(255,255,255,0.18);
+    }
+
+    .dark-toggle-icon {
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .missing {
+      color: var(--muted);
+    }
+
+    .gc {
+      font-weight: 750;
+    }
+
+    .empty {
+      padding: 28px 16px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    footer {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 820px) {
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .toggle {
+        min-height: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <div class="header-inner">
+        <div>
+          <h1>Team Not Pogi La Blanca 2026 Results</h1>
+          <div class="summary">
+            <span id="result-count">27 riders</span>
+            <span>Generated 26 Jul 2026 23:28</span>
+          </div>
+        </div>
+        <button class="dark-toggle" id="dark-toggle" aria-label="Toggle dark mode">
+          <span class="dark-toggle-icon" id="dark-toggle-icon">☀️</span>
+          <span id="dark-toggle-label">Light mode</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="toolbar" aria-label="Result filters">
+      <label>
+        Rider search
+        <input id="search" type="search" placeholder="Search rider or team">
+      </label>
+      <label>
+        vElo Category
+        <select id="category-filter">
+          <option value="">All categories</option>
+        </select>
+      </label>
+      <label>
+        Team
+        <select id="team-filter">
+          <option value="">All teams</option>
+        </select>
+      </label>
+      <label class="toggle">
+        <input id="complete-filter" type="checkbox">
+        Hide incomplete
+      </label>
+    </section>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="cell-position">Pos</th>
+            <th data-sort="riderName">Rider</th>
+            <th data-sort="veloCategorySort">vElo</th>
+            <th data-sort="veloScore">vElo Score</th>
+            <th data-sort="team">Team</th>
+            <th data-sort="stage1Time">Stage 1</th>
+            <th data-sort="stage2Time">Stage 2</th>
+            <th data-sort="stage3Time">Stage 3</th>
+            <th data-sort="stage4Time">Stage 4</th>
+            <th data-sort="stage5Time">Stage 5</th>
+            <th data-sort="gcSort">GC Time</th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+      <div id="empty-state" class="empty" hidden>No riders match the current filters.</div>
+    </div>
+
+    <footer>
+      Created by Will Smith (Cyclobrewer) - https://www.youtube.com/@cyclobrewer
+    </footer>
+  </main>
+
+  <script>
+    const results = [{"riderName":"Christopher Keogh [eSRT]","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2966","team":"eSRT","teamColor":"40bad1","teamBg":"000000","gcTime":"00:33:47","gcSort":2027,"completedStages":1,"isComplete":false,"stage1Time":"00:33:47","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Jacob Ingram","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2019","team":"EVOLUTION","teamColor":"ff09ff","teamBg":"2e1c1c","gcTime":"00:33:57","gcSort":2037,"completedStages":1,"isComplete":false,"stage1Time":"00:33:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Quentin Vee [EVO]","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2069","team":"EVOLUTION","teamColor":"ff09ff","teamBg":"2e1c1c","gcTime":"00:33:57","gcSort":2037,"completedStages":1,"isComplete":false,"stage1Time":"00:33:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Tom R Everested  (TNP)","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1870","team":"BIKELY","teamColor":"ffffff","teamBg":"000000","gcTime":"00:33:57","gcSort":2037,"completedStages":1,"isComplete":false,"stage1Time":"00:33:57","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Den Morrison","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2072","team":"DIRT","teamColor":"29ec34","teamBg":"211208","gcTime":"00:33:58","gcSort":2038,"completedStages":1,"isComplete":false,"stage1Time":"00:33:58","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Ray McCaughey TNP","veloCategory":"1 - Diamond","veloCategorySort":1,"veloScore":"2645","team":"Team Not Pogi","teamColor":"ff0000","teamBg":"ffffff","gcTime":"00:33:58","gcSort":2038,"completedStages":1,"isComplete":false,"stage1Time":"00:33:58","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Ben Howell","veloCategory":"2 - Ruby","veloCategorySort":2,"veloScore":"2032","team":"-","teamColor":"00dd00","teamBg":"-","gcTime":"00:34:05","gcSort":2045,"completedStages":1,"isComplete":false,"stage1Time":"00:34:05","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Mark Redfern [EVO]","veloCategory":"3 - Emerald","veloCategorySort":3,"veloScore":"1866","team":"EVOLUTION","teamColor":"ff09ff","teamBg":"2e1c1c","gcTime":"00:36:39","gcSort":2199,"completedStages":1,"isComplete":false,"stage1Time":"00:36:39","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Jorelle  Hernandez (TZP)","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1581","team":"TZP","teamColor":"ffffff","teamBg":"000508","gcTime":"00:37:15","gcSort":2235,"completedStages":1,"isComplete":false,"stage1Time":"00:37:15","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Tony Cal [TSE]","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1496","team":"TSE","teamColor":"c32323","teamBg":"f5fc72","gcTime":"00:37:42","gcSort":2262,"completedStages":1,"isComplete":false,"stage1Time":"00:37:42","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Corey Green (YT) GarageCycling","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1376","team":"-","teamColor":"00dd00","teamBg":"-","gcTime":"00:38:02","gcSort":2282,"completedStages":1,"isComplete":false,"stage1Time":"00:38:02","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Scott Henderson (BON - GXY)","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1290","team":"[GALAXY]","teamColor":"ffffff","teamBg":"7014f2","gcTime":"00:38:06","gcSort":2286,"completedStages":1,"isComplete":false,"stage1Time":"00:38:06","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Suzie \u0026#128006;\u0026#128142;","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1539","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:38:07","gcSort":2287,"completedStages":1,"isComplete":false,"stage1Time":"00:38:07","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"David Iba\u0026ntilde;ez  (HISP)","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1406","team":"HISP","teamColor":"ff0055","teamBg":"00ffc3","gcTime":"00:38:09","gcSort":2289,"completedStages":1,"isComplete":false,"stage1Time":"00:38:09","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Reinhold Brezovszky [HERC/FS]","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1198","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:38:37","gcSort":2317,"completedStages":1,"isComplete":false,"stage1Time":"00:38:37","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Sam Park \u0026#127475;\u0026#127487;","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1287","team":"Innovation","teamColor":"000000","teamBg":"52ff33","gcTime":"00:38:58","gcSort":2338,"completedStages":1,"isComplete":false,"stage1Time":"00:38:58","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Neil Rogers","veloCategory":"5 - Amethyst","veloCategorySort":5,"veloScore":"1372","team":"[GALAXY]","teamColor":"ffffff","teamBg":"7014f2","gcTime":"00:39:16","gcSort":2356,"completedStages":1,"isComplete":false,"stage1Time":"00:39:16","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"3 Javier (HERC)","veloCategory":"6 - Platinum","veloCategorySort":6,"veloScore":"1242","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:39:21","gcSort":2361,"completedStages":1,"isComplete":false,"stage1Time":"00:39:21","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"David Irwin","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1060","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:41:03","gcSort":2463,"completedStages":1,"isComplete":false,"stage1Time":"00:41:03","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Greg SHED","veloCategory":"4 - Sapphire","veloCategorySort":4,"veloScore":"1529","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:41:03","gcSort":2463,"completedStages":1,"isComplete":false,"stage1Time":"00:41:03","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"david white (HERC)","veloCategory":"7 - Gold","veloCategorySort":7,"veloScore":"1095","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:41:04","gcSort":2464,"completedStages":1,"isComplete":false,"stage1Time":"00:41:04","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Vonita","veloCategory":"8 - Silver","veloCategorySort":8,"veloScore":"946","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:41:05","gcSort":2465,"completedStages":1,"isComplete":false,"stage1Time":"00:41:05","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Matt Jones","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"786","team":"-","teamColor":"00dd00","teamBg":"-","gcTime":"00:44:04","gcSort":2644,"completedStages":1,"isComplete":false,"stage1Time":"00:44:04","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"@ arrows","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"821","team":"-","teamColor":"00dd00","teamBg":"-","gcTime":"00:45:17","gcSort":2717,"completedStages":1,"isComplete":false,"stage1Time":"00:45:17","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Stephen Groundwater [HERC)","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"808","team":"HERC","teamColor":"ffffff","teamBg":"ff007f","gcTime":"00:45:22","gcSort":2722,"completedStages":1,"isComplete":false,"stage1Time":"00:45:22","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Kim Bryan \u0026#127800;","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"759","team":"[GALAXY]","teamColor":"ffffff","teamBg":"7014f2","gcTime":"00:45:42","gcSort":2742,"completedStages":1,"isComplete":false,"stage1Time":"00:45:42","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"},{"riderName":"Simon Richardson MBE PLY (Zwift)(PDQ Coaching)(ZTeam GXY/PDQ)","veloCategory":"9 - Bronze","veloCategorySort":9,"veloScore":"755","team":"[GALAXY]","teamColor":"ffffff","teamBg":"7014f2","gcTime":"00:51:44","gcSort":3104,"completedStages":1,"isComplete":false,"stage1Time":"00:51:44","stage2Time":"-","stage3Time":"-","stage4Time":"-","stage5Time":"-"}];
+
+    function decodeHtml(html) {
+      const txt = document.createElement("textarea");
+      txt.innerHTML = html;
+      return txt.value;
+    }
+    results.forEach(row => {
+      row.riderName = decodeHtml(row.riderName || "");
+      row.team = decodeHtml(row.team || "");
+    });
+
+    const columns = ["stage1Time","stage2Time","stage3Time","stage4Time","stage5Time"];
+    const state = {
+      search: "",
+      category: "",
+      team: "",
+      completeOnly: false,
+      sortKey: "gcSort",
+      sortDirection: "asc"
+    };
+
+    const body = document.querySelector("#results-body");
+    const emptyState = document.querySelector("#empty-state");
+    const resultCount = document.querySelector("#result-count");
+    const searchInput = document.querySelector("#search");
+    const categoryFilter = document.querySelector("#category-filter");
+    const teamFilter = document.querySelector("#team-filter");
+    const completeFilter = document.querySelector("#complete-filter");
+
+    function uniqueValues(key) {
+      return [...new Set(results.map(row => row[key]).filter(value => value && value !== "-"))]
+        .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+    }
+
+    function fillSelect(select, values) {
+      values.forEach(value => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        select.append(option);
+      });
+    }
+
+    function compareRows(a, b) {
+      if (state.sortKey === "gcSort") {
+        const completedStageComparison = b.completedStages - a.completedStages;
+        if (completedStageComparison !== 0) return completedStageComparison;
+      }
+
+      const aValue = a[state.sortKey];
+      const bValue = b[state.sortKey];
+      const direction = state.sortDirection === "asc" ? 1 : -1;
+
+      if (aValue == null && bValue == null) return a.riderName.localeCompare(b.riderName);
+      if (aValue == null) return 1;
+      if (bValue == null) return -1;
+
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return (aValue - bValue) * direction;
+      }
+
+      return String(aValue).localeCompare(String(bValue), undefined, { numeric: true }) * direction;
+    }
+
+    function filteredRows() {
+      const search = state.search.trim().toLowerCase();
+
+      return results
+        .filter(row => !state.category || row.veloCategory === state.category)
+        .filter(row => !state.team || row.team === state.team)
+        .filter(row => !state.completeOnly || row.isComplete)
+        .filter(row => {
+          if (!search) return true;
+          return `${row.riderName} ${row.team}`.toLowerCase().includes(search);
+        })
+        .sort(compareRows);
+    }
+
+    function timeCell(value, extraClass = "") {
+      const className = value === "-" ? `missing ${extraClass}` : extraClass;
+      return `<td class="${className.trim()}">${value}</td>`;
+    }
+
+    function render() {
+      const rows = filteredRows();
+      resultCount.textContent = `${rows.length} of ${results.length} riders`;
+      emptyState.hidden = rows.length > 0;
+
+      body.innerHTML = rows.map((row, index) => `
+        <tr>
+          <td class="cell-position">${index + 1}</td>
+          <td class="cell-rider-name">${escapeHtml(row.riderName)}</td>
+          <td><span class="category">${escapeHtml(row.veloCategory)}</span></td>
+          <td>${escapeHtml(row.veloScore)}</td>
+          <td class="cell-team-name">
+            ${row.team === '-' ? '-' : `<span class="team-badge" style="color: #${row.teamColor || '151719'}; background-color: #${row.teamBg || 'eef3ef'}; border-color: #${row.teamBg || 'afd6d0'};">${escapeHtml(row.team)}</span>`}
+          </td>
+          ${columns.map(column => timeCell(escapeHtml(row[column]))).join("")}
+          ${timeCell(escapeHtml(row.gcTime), "gc")}
+        </tr>
+      `).join("");
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    fillSelect(categoryFilter, uniqueValues("veloCategory"));
+    fillSelect(teamFilter, uniqueValues("team"));
+
+    searchInput.addEventListener("input", event => {
+      state.search = event.target.value;
+      render();
+    });
+
+    categoryFilter.addEventListener("change", event => {
+      state.category = event.target.value;
+      render();
+    });
+
+    teamFilter.addEventListener("change", event => {
+      state.team = event.target.value;
+      render();
+    });
+
+    completeFilter.addEventListener("change", event => {
+      state.completeOnly = event.target.checked;
+      render();
+    });
+
+    document.querySelectorAll("th[data-sort]").forEach(header => {
+      header.addEventListener("click", () => {
+        const key = header.dataset.sort;
+        if (state.sortKey === key) {
+          state.sortDirection = state.sortDirection === "asc" ? "desc" : "asc";
+        } else {
+          state.sortKey = key;
+          state.sortDirection = key === "gcSort" ? "asc" : "asc";
+        }
+        render();
+      });
+    });
+
+    // ── Dark mode ──────────────────────────────────────
+    const html = document.documentElement;
+    const darkToggle = document.querySelector("#dark-toggle");
+    const darkToggleIcon = document.querySelector("#dark-toggle-icon");
+    const darkToggleLabel = document.querySelector("#dark-toggle-label");
+
+    function applyDark(isDark) {
+      html.classList.toggle("dark", isDark);
+      darkToggleIcon.textContent = isDark ? "☀️" : "🌙";
+      darkToggleLabel.textContent = isDark ? "Light mode" : "Dark mode";
+      try { localStorage.setItem("sisu-dark", isDark ? "1" : "0"); } catch(e) {}
+    }
+
+    // Default to dark unless the user has explicitly chosen light
+    const savedPref = (() => { try { return localStorage.getItem("sisu-dark"); } catch(e) { return null; } })();
+    applyDark(savedPref === null ? true : savedPref === "1");
+
+    darkToggle.addEventListener("click", () => applyDark(!html.classList.contains("dark")));
+
+    render();
+  </script>
+</body>
+</html>
